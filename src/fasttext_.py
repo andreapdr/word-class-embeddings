@@ -7,12 +7,11 @@ from util.csv_log import CSVLog
 from util.file import create_if_not_exist
 from util.metrics import *
 from time import time
-from fastText import train_supervised
+from fasttext import train_supervised
 import io
 import numpy as np
 import torch
 import torch.nn as nn
-
 
 def load_vectors(fname):
     fin = io.open(fname, 'r', encoding='utf-8', newline='\n', errors='ignore')

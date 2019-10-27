@@ -150,7 +150,7 @@ def load_pretrained(opt):
 
 
 def init_loss(classification_type):
-    assert classification_type in ['multilabel','singlelabel'], 'unknown classification mode'
+    assert classification_type in ['multilabel', 'singlelabel'], 'unknown classification mode'
     if classification_type == 'multilabel':
         return torch.nn.BCEWithLogitsLoss().cuda()
     elif classification_type == 'singlelabel':
@@ -161,7 +161,7 @@ def init_loss(classification_type):
 def main():
     method_name = set_method_name()
     logfile = init_logfile(method_name, opt)
-    pretrained=load_pretrained(opt)
+    pretrained = load_pretrained(opt)
 
     dataset = Dataset.load(dataset_name=opt.dataset, pickle_path=opt.pickle_path).show()
     word2index, out_of_vocabulary, unk_index, pad_index, devel_index, test_index = index_dataset(dataset, pretrained)

@@ -12,7 +12,7 @@ from data.dataset import *
 from util.csv_log import CSVLog
 from time import time
 from scipy.sparse import issparse, csr_matrix
-from fasttext import embedding_matrix
+from fasttext_ import embedding_matrix
 
 
 def cls_performance(Xtr, ytr, Xte, yte, classification_type, optimizeC=True, estimator=LinearSVC):
