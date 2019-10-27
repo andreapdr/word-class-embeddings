@@ -4,7 +4,7 @@ from scipy.sparse import csr_matrix
 from sklearn.model_selection import train_test_split
 import scipy
 from svm_baselines import cls_performance
-from embedding.supervised import get_supervised_embeddings, fit_predict, multi_domain_sentiment_embeddings
+from embedding.supervised import get_supervised_embeddings, fit_predict
 from model.cnn_class import CNN
 from model.lstm_attn_class import AttentionModel
 from model.lstm_class import LSTMClassifier
