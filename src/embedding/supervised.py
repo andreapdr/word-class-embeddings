@@ -5,7 +5,7 @@ from sklearn.decomposition import PCA
 
 
 def zscores(x, axis=0): #scipy.stats.zscores does not avoid division by 0, which can indeed occur
-    std = np.clip(np.std(x, axis=axis), 1e-5, None)
+    std = np.clip(np.std(x, ddof=1, axis=axis), 1e-5, None)
     mean = np.mean(x, axis=axis)
     return (x - mean) / std
 
@@ -56,15 +56,14 @@ def get_supervised_embeddings(X, Y, max_label_space=300, binary_structural_probl
     elif method == 'chi2':
         F = supervised_embeddings_tsr(X, Y, chi_square)
 
+    if dozscore:
+        F = zscores(F, axis=0)
+
     if nC > max_label_space:
         print(f'supervised matrix has more dimensions ({nC}) than the allowed limit {max_label_space}. '
               f'Applying PCA(n_components={max_label_space})')
         pca = PCA(n_components=max_label_space)
         F = pca.fit(F).transform(F)
-        F /= pca.singular_values_
-
-    if dozscore:
-        F = zscores(F, axis=0)
 
     return F
 

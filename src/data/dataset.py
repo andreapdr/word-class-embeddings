@@ -70,6 +70,9 @@ class Dataset:
 
     def _load_rcv1(self):
         data_path = '../datasets/RCV1-v2/unprocessed_corpus' #TODO: check when missing
+        if not (os.path.isdir(data_path)):
+            os.makedirs(data_path)
+            print('path created')
         devel = fetch_RCV1(subset='train', data_path=data_path)
         test = fetch_RCV1(subset='test', data_path=data_path)
 

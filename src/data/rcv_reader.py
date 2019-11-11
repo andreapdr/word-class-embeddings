@@ -80,7 +80,7 @@ def fetch_RCV1(data_path, subset='all'):
     # global nwords
     # nwords=[]
     for part in list_files(data_path):
-        if not re.match('\d+\.zip', part): continue
+        # if not re.match('\d+\.zip', part): continue
         target_file = join(data_path, part)
         assert exists(target_file), \
             "You don't seem to have the file "+part+" in " + data_path + ", and the RCV1 corpus can not be downloaded"+\
