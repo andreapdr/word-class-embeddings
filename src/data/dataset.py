@@ -7,6 +7,8 @@ from data.ohsumed_reader import fetch_ohsumed50k
 from data.reuters21578_reader import fetch_reuters21578
 from data.rcv_reader import fetch_RCV1
 from data.wipo_reader import fetch_WIPOgamma, WipoGammaDocument
+from data.amazon_reader import fetch_amazon_pet
+from data.yelp_reader import  fetch_yelp_review
 import pickle
 import numpy as np
 from tqdm import tqdm
@@ -21,11 +23,11 @@ def init_vectorizer():
 class Dataset:
 
     dataset_available = {'reuters21578', '20newsgroups', 'ohsumed', 'rcv1', 'ohsumed', 'jrcall',
-                         'wipo-sl-mg','wipo-ml-mg','wipo-sl-sc','wipo-ml-sc'}
+                         'wipo-sl-mg','wipo-ml-mg','wipo-sl-sc','wipo-ml-sc', 'amazon-pet', 'yelp-review'}
 
     def __init__(self, name):
         assert name in Dataset.dataset_available, f'dataset {name} is not available'
-        if name=='reuters21578':
+        if name == 'reuters21578':
             self._load_reuters()
         elif name == '20newsgroups':
             self._load_20news()
@@ -43,6 +45,10 @@ class Dataset:
             self._load_wipo('singlelabel', 'subclass')
         elif name == 'wipo-ml-sc':
             self._load_wipo('multilabel', 'subclass')
+        elif name == 'amazon-pet':
+            self._load_amazon_pet()
+        elif name == 'yelp-review':
+            self._load_yelp_review()
 
         self.nC = self.devel_labelmatrix.shape[1]
         self._vectorizer = init_vectorizer()
@@ -65,7 +71,9 @@ class Dataset:
 
         self.classification_type = 'multilabel'
         self.devel_raw, self.test_raw = mask_numbers(devel.data), mask_numbers(test.data)
-        self.devel_labelmatrix, self.test_labelmatrix = _label_matrix(devel.target, test.target)
+        self.devel_target, self.test_target = devel.target, test.target
+        self.devel_labelmatrix, self.test_labelmatrix = _label_matrix(self.devel_target.reshape(-1, 1),
+                                                                      self.test_target.reshape(-1, 1))
         self.devel_target, self.test_target = self.devel_labelmatrix, self.test_labelmatrix
 
     def _load_rcv1(self):
@@ -169,6 +177,25 @@ class Dataset:
             self.devel_target, self.test_target = devel_target, test_target
             self.devel_labelmatrix, self.test_labelmatrix = _label_matrix(self.devel_target.reshape(-1, 1), self.test_target.reshape(-1, 1))
 
+    def _load_amazon_pet(self):
+        data_path = os.path.join(get_data_home(), 'amazon_dataset')
+        devel = fetch_amazon_pet(subset='train', data_path=data_path)
+        test = fetch_amazon_pet(subset='test', data_path=data_path)
+
+        self.classification_type = 'singlelabel'
+        self.devel_raw, self.test_raw = mask_numbers(devel.data), mask_numbers(test.data)
+        self.devel_target, self.test_target = devel.target, test.target
+        self.devel_labelmatrix, self.test_labelmatrix = _label_matrix(self.devel_target.reshape(-1,1), self.test_target.reshape(-1,1))
+
+    def _load_yelp_review(self):
+        data_path = os.path.join(get_data_home(), 'yelp_dataset')
+        devel = fetch_yelp_review(subset='train', data_path=data_path)
+        test = fetch_yelp_review(subset='test', data_path=data_path)
+        self.classification_type = 'singlelabel'
+        self.devel_raw, self.test_raw = mask_numbers(devel.data), mask_numbers(test.data)
+        self.devel_target, self.test_target = devel.target, test.target
+        self.devel_labelmatrix, self.test_labelmatrix = _label_matrix(self.devel_target.reshape(-1, 1),
+                                                                      self.test_target.reshape(-1, 1))
     def vectorize(self):
         if not hasattr(self, 'Xtr') or not hasattr(self, 'Xte'):
             self.Xtr = self._vectorizer.transform(self.devel_raw)

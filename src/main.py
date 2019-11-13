@@ -311,7 +311,7 @@ if __name__ == '__main__':
                         'validation set once training is over (default 1)')
     parser.add_argument('--word2vec-path', type=str, default='../datasets/Word2Vec/GoogleNews-vectors-negative300.bin',
                         metavar='str', help=f'path to GoogleNews-vectors-negative300.bin pretrained vectors (used only with --pretrained word2vec)')
-    parser.add_argument('--glove-path', type=str, default='.vector_cache',
+    parser.add_argument('--glove-path', type=str, default='/storage/andrea/WCE/.vector_cache',
                         metavar='str',
                         help=f'path to glove.840B.300d pretrained vectors (used only with --pretrained word2vec)')
     parser.add_argument('--max-label-space', type=int, default=300, metavar='int', help='larger dimension allowed for the '
@@ -334,7 +334,5 @@ if __name__ == '__main__':
     assert not opt.plotmode or opt.test_each > 0, 'plot mode implies --test-each>0'
     assert opt.supervised_method in ['dotn', 'ppmi', 'ig', 'chi2']
     if opt.pickle_dir: opt.pickle_path = join(opt.pickle_dir, f'{opt.dataset}.pickle')
-    # os.mkdir(opt.pickle_dir)
-    # print(f'###### {opt.pickle_dir, }')
 
     main()
