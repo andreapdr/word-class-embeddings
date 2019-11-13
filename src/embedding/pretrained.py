@@ -3,6 +3,7 @@ import torch, torchtext
 import gensim
 import os
 import numpy as np
+from torchtext.vocab import Vectors
 
 
 class KeyedVectors:
@@ -30,7 +31,6 @@ class KeyedVectors:
         extraction[np.asarray(source_idx)] = self.weights[np.asarray(target_idx)]
 
         return extraction
-
 
 
 class PretrainedEmbeddings(ABC):
@@ -100,4 +100,38 @@ class Word2Vec(PretrainedEmbeddings):
         extraction[source_idx] = self.embed.vectors[target_idx]
         extraction = torch.from_numpy(extraction).float()
         return extraction
+
+
+class FastTextWikiNews(Vectors):
+
+    url_base = 'https://dl.fbaipublicfiles.com/fasttext/vectors-english/wiki-news-300d-{}.vec'
+
+    def __init__(self, language="en", **kwargs):
+        url = self.url_base.format(language)
+        name = os.path.basename(url)
+        super(FastTextWikiNews, self).__init__(name, url=url, **kwargs)
+
+
+class FastText(PretrainedEmbeddings):
+
+    def __init__(self, path, setname='1M', limit=None):
+        super().__init__()
+        print(f'Loading fastText pretrained vectors from {path}')
+        assert os.path.exists(path), print(f'pre-trained vectors not found in {path}')
+        self.embed = FastTextWikiNews(setname, cache=path, max_vectors=limit)
+        print('Done')
+
+    def vocabulary(self):
+        return set(self.embed.stoi.keys())
+
+    def dim(self):
+        return self.embed.dim
+
+    def extract(self, words):
+        source_idx, target_idx = PretrainedEmbeddings.reindex(words, self.embed.stoi)
+        extraction = torch.zeros((len(words), self.dim()))
+        extraction[source_idx] = self.embed.vectors[target_idx]
+        return extraction
+
+
 

@@ -15,6 +15,7 @@ from util.file import create_if_not_exist
 from util.metrics import *
 from time import time
 from embedding.pretrained import *
+from tqdm import tqdm
 
 allowed_nets = {'cnn', 'lstm', 'attn'}
 
@@ -145,6 +146,8 @@ def load_pretrained(opt):
         return GloVe(path=opt.glove_path)
     elif opt.pretrained == 'word2vec':
         return Word2Vec(path=opt.word2vec_path, limit=1000000)
+    elif opt.pretrained == 'fastText':
+        return FastText(path='/storage/andrea/WCE/embeddings/fasttext/', limit=1000000)
     return None
 
 
@@ -330,7 +333,7 @@ if __name__ == '__main__':
     torch.manual_seed(opt.seed)
 
     assert opt.dataset in available_datasets, f'unknown dataset {opt.dataset}'
-    assert opt.pretrained in {None, 'glove', 'word2vec'}, f'unknown pretrained set {opt.pretrained}'
+    assert opt.pretrained in {None, 'glove', 'word2vec', 'fastText'}, f'unknown pretrained set {opt.pretrained}'
     assert not opt.plotmode or opt.test_each > 0, 'plot mode implies --test-each>0'
     assert opt.supervised_method in ['dotn', 'ppmi', 'ig', 'chi2']
     if opt.pickle_dir: opt.pickle_path = join(opt.pickle_dir, f'{opt.dataset}.pickle')
